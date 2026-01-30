@@ -20,7 +20,7 @@ if not GEMINI_API_KEY:
 
 genai.configure(api_key=GEMINI_API_KEY)
 
-model = genai.GenerativeModel("models/gemini-flash-latest")
+model = genai.GenerativeModel("models/gemini-pro-latest")
 
 
 def classify_intent(user_message: str) -> str:
@@ -93,6 +93,6 @@ def chat_with_bank_saathi(user_message: str, context: dict) -> str:
     except Exception:
         # Graceful fallback (demo-safe)
         return (
-            "⚫ I couldn’t analyze this transaction right now due to a system issue. "
+            " I couldn’t analyze this transaction right now due to a system issue. "
             "Please try again in a moment."
         )
