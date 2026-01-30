@@ -1,7 +1,14 @@
+import os
 import google.generativeai as genai
 from prompts import SYSTEM_PROMPT
 
-genai.configure(api_key="AIzaSyAjN3a1znzl1QvZMkl7NnAqXddRDFFyz_s")
+# 🔐 Read API key from environment
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+if not GEMINI_API_KEY:
+    raise RuntimeError("GEMINI_API_KEY environment variable is not set")
+
+genai.configure(api_key=GEMINI_API_KEY)
 
 model = genai.GenerativeModel("models/gemini-flash-latest")
 
@@ -33,11 +40,14 @@ Transaction Context:
 """
 
     if intent == "EXPLAIN":
-        task = "Explain in 2 calm sentences why the system flagged this transaction."
+        task = (
+            "Explain in 2 short, formal sentences why the system flagged this transaction. "
+            "Do not give advice."
+        )
     elif intent == "SIMULATE":
         task = (
-            "Simulate what could happen if the user proceeds. "
-            "Do NOT approve or block. Focus on budget and risk impact."
+            "Describe potential consequences if the transaction proceeds, "
+            "without recommending or discouraging the action."
         )
     elif intent == "CONFIDENCE":
         task = (
@@ -45,8 +55,8 @@ Transaction Context:
         )
     else:
         return (
-            "The user is asking outside the allowed scope. "
-            "Politely refuse and remind them you can only discuss this transaction."
+            "Politely state that you can only discuss the current transaction "
+            "and cannot answer questions outside this scope."
         )
 
     return f"""
