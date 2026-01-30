@@ -1,6 +1,16 @@
 import os
+
+# ✅ Load .env ONLY for local development (safe in Render)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    # dotenv not installed (Render is fine)
+    pass
+
 import google.generativeai as genai
 from prompts import SYSTEM_PROMPT
+
 
 # 🔐 Read API key from environment
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -73,8 +83,16 @@ Task:
 
 
 def chat_with_bank_saathi(user_message: str, context: dict) -> str:
-    intent = classify_intent(user_message)
-    prompt = build_prompt(intent, context, user_message)
+    try:
+        intent = classify_intent(user_message)
+        prompt = build_prompt(intent, context, user_message)
 
-    response = model.generate_content(prompt)
-    return response.text.strip()
+        response = model.generate_content(prompt)
+        return response.text.strip()
+
+    except Exception:
+        # Graceful fallback (demo-safe)
+        return (
+            "⚫ I couldn’t analyze this transaction right now due to a system issue. "
+            "Please try again in a moment."
+        )
